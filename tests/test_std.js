@@ -97,14 +97,44 @@ function test_getline()
     f.close();
 }
  
+function test_popen()
+{
+    var str, f, fname = "tmp_file.txt";
+    var content = "hello world";
+
+    f = std.open(fname, "w");
+    f.puts(content);
+    f.close();
+
+    /* execute the 'cat' shell command */
+    f = std.popen("cat " + fname, "r");
+    str = f.readAsString();
+    f.close();
+
+    assert(str, content);
+
+    os.remove(fname);
+}
+
 function test_os()
 {
-    var fd, fname, buf, buf2, i;
+    var fd, fpath, fname, fdir, buf, buf2, i, files, err, fdate, st, link_path;
 
     assert(os.isatty(0));
 
+    fdir = "test_tmp_dir";
     fname = "tmp_file.txt";
-    fd = os.open(fname, os.O_RDWR | os.O_CREAT | os.O_TRUNC);
+    fpath = fdir + "/" + fname;
+    link_path = fdir + "/test_link";
+    
+    os.remove(link_path);
+    os.remove(fpath);
+    os.remove(fdir);
+
+    err = os.mkdir(fdir, 0o755);
+    assert(err === 0);
+    
+    fd = os.open(fpath, os.O_RDWR | os.O_CREAT | os.O_TRUNC);
     assert(fd >= 0);
     
     buf = new Uint8Array(10);
@@ -121,10 +151,78 @@ function test_os()
     
     assert(os.close(fd) === 0);
 
-    assert(os.remove(fname) === 0);
+    [files, err] = os.readdir(fdir);
+    assert(err, 0);
+    assert(files.indexOf(fname) >= 0);
 
-    fd = os.open(fname, os.O_RDONLY);
+    fdate = 10000;
+
+    err = os.utimes(fpath, fdate, fdate);
+    assert(err, 0);
+    
+    [st, err] = os.stat(fpath);
+    assert(err, 0);
+    assert(st.mode & os.S_IFMT, os.S_IFREG);
+    assert(st.mtime, fdate);
+
+    err = os.symlink(fname, link_path);
+    assert(err === 0);
+    
+    [st, err] = os.lstat(link_path);
+    assert(err, 0);
+    assert(st.mode & os.S_IFMT, os.S_IFLNK);
+
+    [buf, err] = os.readlink(link_path);
+    assert(err, 0);
+    assert(buf, fname);
+    
+    assert(os.remove(link_path) === 0);
+
+    [buf, err] = os.getcwd();
+    assert(err, 0);
+
+    [buf2, err] = os.realpath(".");
+    assert(err, 0);
+
+    assert(buf, buf2);
+    
+    assert(os.remove(fpath) === 0);
+
+    fd = os.open(fpath, os.O_RDONLY);
     assert(fd < 0);
+
+    assert(os.remove(fdir) === 0);
+}
+
+function test_os_exec()
+{
+    var ret, fds, pid, f, status;
+
+    ret = os.exec(["true"]);
+    assert(ret, 0);
+
+    ret = os.exec(["/bin/sh", "-c", "exit 1"], { usePath: false });
+    assert(ret, 1);
+    
+    fds = os.pipe();
+    pid = os.exec(["echo", "hello"], { stdout: fds[1], block: false } );
+    assert(pid >= 0);
+    os.close(fds[1]); /* close the write end (as it is only in the child)  */
+    f = std.fdopen(fds[0], "r");
+    assert(f.getline(), "hello");
+    assert(f.getline(), null);
+    f.close();
+    [ret, status] = os.waitpid(pid, 0);
+    assert(ret, pid);
+    assert(status & 0x7f, 0); /* exited */
+    assert(status >> 8, 0); /* exit code */
+
+    pid = os.exec(["cat"], { block: false } );
+    assert(pid >= 0);
+    os.kill(pid, os.SIGQUIT);
+    [ret, status] = os.waitpid(pid, 0);
+    assert(ret, pid);
+    assert(status & 0x7f, os.SIGQUIT);
 }
 
 function test_timer()
@@ -143,5 +241,7 @@ test_printf();
 test_file1();
 test_file2();
 test_getline();
+test_popen();
 test_os();
+test_os_exec();
 test_timer();

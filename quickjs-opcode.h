@@ -39,6 +39,7 @@ FMT(i16)
 FMT(label16)
 FMT(npop)
 FMT(npopx)
+FMT(npop_u16)
 FMT(loc)
 FMT(arg)
 FMT(var_ref)
@@ -114,7 +115,8 @@ DEF(      add_brand, 1, 2, 0, none) /* this_obj home_obj -> */
 DEF(   return_async, 1, 1, 0, none)
 DEF(          throw, 1, 1, 0, none)
 DEF(      throw_var, 6, 0, 0, atom_u8)
-DEF(           eval, 3, 1, 1, u16)
+DEF(           eval, 5, 1, 1, npop_u16) /* func args... -> ret_val */
+DEF(     apply_eval, 3, 2, 1, u16) /* func array -> ret_eval */
 DEF(         regexp, 1, 2, 1, none) /* create a RegExp object from the pattern and a
                                        bytecode string */
 DEF( get_super_ctor, 1, 1, 1, none)
@@ -155,7 +157,8 @@ DEF(         append, 1, 3, 2, none) /* append enumerated object, update length *
 DEF(copy_data_properties, 2, 3, 3, u8)
 DEF(  define_method, 6, 2, 1, atom_u8)
 DEF(define_method_computed, 2, 3, 1, u8) /* must come after define_method */
-DEF(   define_class, 6, 2, 2, atom_u8)
+DEF(   define_class, 6, 2, 2, atom_u8) /* parent ctor -> ctor proto */
+DEF(   define_class_computed, 6, 3, 3, atom_u8) /* field_name parent ctor -> field_name ctor proto (class with computed name) */
 
 DEF(        get_loc, 3, 0, 1, loc)
 DEF(        put_loc, 3, 1, 0, loc) /* must come after get_loc */
@@ -284,6 +287,8 @@ def(scope_get_private_field, 7, 1, 1, atom_u16) /* obj -> value, emitted in phas
 def(scope_get_private_field2, 7, 1, 2, atom_u16) /* obj -> obj value, emitted in phase 1, removed in phase 2 */
 def(scope_put_private_field, 7, 1, 1, atom_u16) /* obj value ->, emitted in phase 1, removed in phase 2 */
 
+def( set_class_name, 5, 1, 1, u32) /* emitted in phase 1, removed in phase 2 */
+    
 def(       line_num, 5, 0, 0, u32) /* emitted in phase 1, removed in phase 3 */
 
 #if SHORT_OPCODES
