@@ -1,8 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- Created by GNU Texinfo 6.5, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.1, http://www.gnu.org/software/texinfo/ -->
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Javascript Bignum Extensions</title>
 
 <meta name="description" content="Javascript Bignum Extensions">
@@ -10,6 +9,7 @@
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="#SEC_Contents" rel="contents" title="Table of Contents">
 <style type="text/css">
 <!--
@@ -120,7 +120,7 @@ language while being 100% backward compatible:
 </p>
 <ul>
 <li> Overloading of the standard operators
-to support new types such as complex numbers, fractions or matrixes.
+to support new types such as complex numbers, fractions or matrices.
 
 </li><li> Bigint mode where arbitrarily large integers are available by default (no <code>n</code> suffix is necessary as in the TC39 BigInt proposal<a name="DOCF1" href="#FOOT1"><sup>1</sup></a>).
 
@@ -551,7 +551,7 @@ raised if <em>a &lt; 0</em>.
 <h4 class="subsection">3.5.3 <code>Number</code> constructor</h4>
 
 <p>The number constructor returns its argument rounded to a Float using
-the global floating point environement. In bigint mode, the Number
+the global floating point environment. In bigint mode, the Number
 constructor returns a Float. In standard mode, it returns a SmallInt
 if the value fits it, otherwise a Float.
 </p>
@@ -637,8 +637,9 @@ strictly smaller than the maximum allowed number of exponent bits
 flag is set to <code>true</code>. Otherwise it is set to <code>false</code>;
 </p>
 <p>For example, <code>prec = 53</code> and <code> expBits = 11</code> give exactly
-the same precision as the IEEE 754 64 bit floating point type. It is
-the default floating point precision.
+the same precision as the IEEE 754 64 bit floating point. The
+default precision is <code>prec = 113</code> and <code> expBits = 15</code> (IEEE
+754 128 bit floating point).
 </p>
 <p>The global floating point environment can only be modified temporarily
 when calling a function (see <code>BigFloatEnv.setPrec</code>). Hence a
@@ -713,6 +714,14 @@ result is rounded according to the floating point environment <code>e</code>
 or the global environment if <code>e</code> is undefined.
 </p>
 </dd>
+<dt><code>isFinite(a)</code></dt>
+<dd><p>Return true if <code>a</code> is a finite bigfloat.
+</p>
+</dd>
+<dt><code>isNaN(a)</code></dt>
+<dd><p>Return true if <code>a</code> is a NaN bigfloat.
+</p>
+</dd>
 <dt><code>add(a, b[, e])</code></dt>
 <dt><code>sub(a, b[, e])</code></dt>
 <dt><code>mul(a, b[, e])</code></dt>
@@ -723,12 +732,11 @@ point number <code>a</code> according to the floating point environment
 <code>e</code> is specified, the floating point status flags are updated.
 </p>
 </dd>
-<dt><code>floor(x[, e])</code></dt>
-<dt><code>ceil(x[, e])</code></dt>
-<dt><code>round(x[, e])</code></dt>
-<dt><code>trunc(x[, e])</code></dt>
-<dd><p>Round to integer. A rounded <code>BigFloat</code> is returned. <code>e</code> is an
-optional floating point environment.
+<dt><code>floor(x)</code></dt>
+<dt><code>ceil(x)</code></dt>
+<dt><code>round(x)</code></dt>
+<dt><code>trunc(x)</code></dt>
+<dd><p>Round to an integer. No additional rounding is performed.
 </p>
 </dd>
 <dt><code>fmod(x, y[, e])</code></dt>
@@ -889,7 +897,7 @@ bits. Must be at least 11.
 </dd>
 <dt><code>RNDF<a name="DOCF8" href="#FOOT8"><sup>8</sup></a></code></dt>
 <dd><p>Read-only integer. Faithful rounding mode. The result is
-non-deterministicly rounded to -Infinity or +Infinity. This rounding
+non-deterministically rounded to -Infinity or +Infinity. This rounding
 mode usually gives a faster and deterministic running time for the
 floating point operations.
 </p>
@@ -1027,7 +1035,7 @@ exactly represented as base 2 floating point number. In order to
 ensure that the literal is represented accurately with the current
 precision, it must be evaluated at runtime.</p>
 <h3><a name="FOOT8" href="#DOCF8">(8)</a></h3>
-<p>Could be removed in case a deterministic behvior for floating point operations is required.</p>
+<p>Could be removed in case a deterministic behavior for floating point operations is required.</p>
 </div>
 <hr>
 

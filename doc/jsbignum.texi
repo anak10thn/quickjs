@@ -28,7 +28,7 @@ language while being 100% backward compatible:
 @itemize
 
 @item Overloading of the standard operators
-to support new types such as complex numbers, fractions or matrixes.
+to support new types such as complex numbers, fractions or matrices.
 
 @item Bigint mode where arbitrarily large integers are available by default (no @code{n} suffix is necessary as in the TC39 BigInt proposal@footnote{@url{https://tc39.github.io/proposal-bigint/}}).
 
@@ -417,7 +417,7 @@ It is a normal object.
 @subsection @code{Number} constructor
 
 The number constructor returns its argument rounded to a Float using
-the global floating point environement. In bigint mode, the Number
+the global floating point environment. In bigint mode, the Number
 constructor returns a Float. In standard mode, it returns a SmallInt
 if the value fits it, otherwise a Float.
 
@@ -496,8 +496,9 @@ strictly smaller than the maximum allowed number of exponent bits
 flag is set to @code{true}. Otherwise it is set to @code{false};
 
 For example, @code{prec = 53} and @code{ expBits = 11} give exactly
-the same precision as the IEEE 754 64 bit floating point type. It is
-the default floating point precision.
+the same precision as the IEEE 754 64 bit floating point. The
+default precision is @code{prec = 113} and @code{ expBits = 15} (IEEE
+754 128 bit floating point).
 
 The global floating point environment can only be modified temporarily
 when calling a function (see @code{BigFloatEnv.setPrec}). Hence a
@@ -568,6 +569,12 @@ means radix 10 unless there is a hexadecimal or binary prefix. The
 result is rounded according to the floating point environment @code{e}
 or the global environment if @code{e} is undefined.
 
+@item isFinite(a)
+Return true if @code{a} is a finite bigfloat.
+
+@item isNaN(a)
+Return true if @code{a} is a NaN bigfloat.
+
 @item add(a, b[, e])
 @item sub(a, b[, e])
 @item mul(a, b[, e])
@@ -577,12 +584,11 @@ point number @code{a} according to the floating point environment
 @code{e} or the global environment if @code{e} is undefined. If
 @code{e} is specified, the floating point status flags are updated.
 
-@item floor(x[, e])
-@item ceil(x[, e])
-@item round(x[, e])
-@item trunc(x[, e])
-Round to integer. A rounded @code{BigFloat} is returned. @code{e} is an
-optional floating point environment.
+@item floor(x)
+@item ceil(x)
+@item round(x)
+@item trunc(x)
+Round to an integer. No additional rounding is performed.
 
 @item fmod(x, y[, e])
 @item remainder(x, y[, e])
@@ -723,9 +729,9 @@ Read-only integer. Round to nearest, with ties away from zero rounding mode.
 @item RNDNU
 Read-only integer. Round to nearest, with ties to +Infinity rounding mode.
 
-@item RNDF@footnote{Could be removed in case a deterministic behvior for floating point operations is required.}
+@item RNDF@footnote{Could be removed in case a deterministic behavior for floating point operations is required.}
 Read-only integer. Faithful rounding mode. The result is
-non-deterministicly rounded to -Infinity or +Infinity. This rounding
+non-deterministically rounded to -Infinity or +Infinity. This rounding
 mode usually gives a faster and deterministic running time for the
 floating point operations.
 
